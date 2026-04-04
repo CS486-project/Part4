@@ -9,8 +9,7 @@ AI Chatbot Working
 
 Document Collection
 
-<img width="508" height="318" alt="Screenshot 2026-03-11 at 11 37 24 AM" src="https://github.com/user-attachments/assets/332a419e-7933-4612-9d32-00f49e655067" />
-
+<img width="1327" height="716" alt="Screenshot 2026-04-04 at 8 37 39 AM" src="https://github.com/user-attachments/assets/45581dfc-6015-4288-ad28-331b3a5dedc1" />
 
 Interaction Logs
 

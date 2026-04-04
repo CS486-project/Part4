@@ -33,6 +33,25 @@ async function sendMessage(inputElement) {
             const data = await response.json();
             messagesContainer.innerHTML += `<p>Bot: ${data.botResponse}</p>`;
 
+            // Display confidence metrics
+            if (data.confidenceMetrics) {
+                const cm = data.confidenceMetrics;
+                const pct = (cm.overallConfidence * 100).toFixed(1);
+                messagesContainer.innerHTML += `<p id="confidence">Confidence: ${pct}% (method: ${cm.retrievalMethod})</p>`;
+            }
+
+            // Display retrieved evidence
+            if (data.retrievedDocuments && data.retrievedDocuments.length > 0) {
+                let evidenceHTML = '<div id="evidence">Retrieved Evidence:<ul>';
+                data.retrievedDocuments.forEach((doc) => {
+                    const score = (doc.relevanceScore ?? doc.score ?? 0).toFixed(4);
+                    const preview = doc.chunkText.length > 200 ? doc.chunkText.substring(0, 200) + '...' : doc.chunkText;
+                    evidenceHTML += `<li>${doc.documentName} (score: ${score})<br><small>${preview}</small></li>`;
+                });
+                evidenceHTML += '</ul></div>';
+                messagesContainer.innerHTML += evidenceHTML;
+            }
+
         } catch (error) {
             console.error('Error sending message:', error);
             messagesContainer.innerHTML += `<p>Error: Failed to get response from bot</p>`;
@@ -86,12 +105,6 @@ retrievalDropdown.addEventListener("change", () => {
     console.log("Selected retrieval method: ", retrievalDropdown.value);
 });
 
-const uploadButton = document.getElementById("upload-btn");
-uploadButton.addEventListener("click", (event) => {
-    console.log("Selected file: ", fileInput.files[0].name);
-    event.preventDefault();
-});
-
 // Log hover and focus events on the input field
 document.getElementById('user-input').addEventListener('mouseover', () => {
     logEvent('hover', 'User Input');
@@ -112,4 +125,63 @@ function logEvent(type, element) {
     });
 }
 
-loadHistory();
+document.getElementById("upload-btn").addEventListener("click", async (event) => {
+    console.log("Selected file: ", fileInput.files[0].name);
+    event.preventDefault();
+
+    const fileInput = document.getElementById("file-input");
+    const file = fileInput.files[0];
+  
+    if (!file) {
+        alert("Choose a file first.");
+        return;
+    }
+  
+    const formData = new FormData();
+    formData.append("document", file);
+  
+    const response = await fetch("/upload-document", {
+        method: "POST",
+        body: formData
+    });
+  
+    const data = await response.json();
+    console.log(data);
+    
+    await loadDocuments();
+});
+
+async function loadDocuments() {
+    const documentsList = document.getElementById('documents-list');
+    const placeholder = document.getElementById('uploaded-docs-placeholder');
+    if (!documentsList || !placeholder) {
+        return;
+    }
+    try {
+        const response = await fetch("/documents");
+        const docs = await response.json();
+        console.log("Docs:", docs);
+    
+        const documentsList = document.getElementById("documents-list");
+        documentsList.innerHTML = "";
+
+        const placeholder = document.getElementById("uploaded-docs-placeholder");
+
+        if (docs.length === 0) {
+            placeholder.style.display = '';
+            return;
+        }
+
+        placeholder.style.display = 'none';
+    
+        docs.forEach((doc) => {
+            const li = document.createElement("li");
+            li.textContent = `${doc.filename} - ${doc.processingStatus}`;
+            documentsList.appendChild(li);
+        });
+    } catch (e) {
+        console.error('loadDocuments:', e);
+    }
+}
+
+loadHistory();loadDocuments();

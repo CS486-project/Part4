@@ -239,3 +239,35 @@ body#home #participant-section {
 #start-btn:hover {
     background-color: #0969ca;
 }
+
+#confidence {
+    align-self: flex-start;
+    font-size: 0.85em;
+    color: #555;
+    padding: 4px 14px;
+    margin: 0;
+}
+
+#evidence {
+    align-self: flex-start;
+    font-size: 0.85em;
+    color: #555;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px 14px;
+    max-width: 70%;
+}
+
+#evidence ul {
+    padding-left: 16px;
+    margin: 6px 0 0;
+}
+
+#evidence li {
+    margin-bottom: 8px;
+}
+
+#evidence small {
+    color: #777;
+}
